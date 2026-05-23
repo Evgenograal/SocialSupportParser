@@ -19,23 +19,20 @@ def process_single_file(file_path, input_dir, output_dir, log_callback, log_file
         cleaned = clean_text(raw_text)
 
         if not cleaned:
-            write_to_log_file(log_file_path, f"{filename} - ошибка")
+            write_to_log_file(log_file_path, f"{filename} - ошибка: пустой файл")
 
             return filename, False, "Пустой"
 
         prompt = build_prompt(cleaned)
-
         completion = call_model(prompt, filename, log_callback)
-
         response_text = (completion.choices[0].message.content)
-
         data = extract_json(response_text)
 
-        relative_path = os.path.relpath(file_path, start = input_dir)
+        relative_path = os.path.relpath(file_path, start=input_dir)
+        relative_path = os.path.splitext(relative_path)[0] + ".json"
+        out_path = os.path.join(output_dir, relative_path)
 
-        relative_path = (os.path.splitext(relative_path)[0] + ".json")
-
-        out_path = os.path.join(output_dir, exist_ok = True)
+        os.makedirs(os.path.dirname(out_path), exist_ok=True)
 
         with open(out_path, 'w', encoding = 'utf-8') as f:
             json.dump(data, f, ensure_ascii = False, indent = 2)
@@ -47,23 +44,24 @@ def process_single_file(file_path, input_dir, output_dir, log_callback, log_file
             return filename, True, "OK"
         
     except Exception as e:
-        write_to_log_file(log_file_path, f"{filename} - ошибка")
+        write_to_log_file(log_file_path, f"{filename} - ошибка {str(e)}")
 
         return filename, False, str(e)
     
 def process_folder(input_dir, output_dir, log_callback, progress_callback):
     files = []
 
-    for f in filenames:
-        if f.lower().endswith((".md", ".txt")):
-            file.append(os.path.join(root_dir, f))
+    for root, _, filenames in os.walk(input_dir):
+        for f in filenames:
+            if f.lower().endswith((".md", ".txt")):
+                files.append(os.path.join(root, f))
     
     total = len(files)
 
     log_file_path = os.path.join(output_dir, "progress_log.txt")
 
     with open(log_file_path, 'w', encoding = 'utf-8') as f:
-        f.writa("=== LOG ===")
+        f.write("=== LOG ===\n")
 
     completed = 0
 
