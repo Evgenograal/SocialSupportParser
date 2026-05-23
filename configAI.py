@@ -18,6 +18,6 @@ Api_keys = [
 
 Base_url = "https://api.groq.com/openai/v1"
 
-max_retries = 10
-max_workers = 5
-request_delay = 0.5
+Max_retries = 10
+Max_workers = 5
+Request_delay = 0.5
