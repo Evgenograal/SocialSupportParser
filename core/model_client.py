@@ -57,6 +57,5 @@ def call_model(promt, filename, log_callback):
             time.sleep(wait_time)
 
             continue
-        raise
 
-raise Exception("Предел попыток")
+    raise Exception("Предел попыток")

@@ -84,7 +84,6 @@ def build_prompt(text: str) -> str:
 
 Текст:
 
-"""
+
 {text}
-"""
 """

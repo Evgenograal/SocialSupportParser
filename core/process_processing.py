@@ -51,7 +51,7 @@ def process_single_file(file_path, input_dir, output_dir, log_callback, log_file
 
         return filename, False, str(e)
     
-def progress_folder(input_dir, output_dir, log_callback, progress_callback):
+def process_folder(input_dir, output_dir, log_callback, progress_callback):
     files = []
 
     for f in filenames:
