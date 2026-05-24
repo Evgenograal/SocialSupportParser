@@ -19,12 +19,12 @@ def get_client():
     with client_lock:
         client = clients[client_index]
 
-        client_index = (client_index + 1) % len(client)
+        client_index = (client_index + 1) % len(clients)
     
     return client 
 
-def call_model(promt, filename, log_callback):
-    for attemp in range(max_retries):
+def call_model(prompt, filename, log_callback):
+    for attemp in range(Max_retries):
         try:
             client = get_client()
 
@@ -34,7 +34,7 @@ def call_model(promt, filename, log_callback):
                     messages = [
                         {
                             'role': 'user',
-                            'content': 'promt'
+                            'content': prompt
                         }
                     ],
                     temperature = 0.1,
@@ -52,10 +52,10 @@ def call_model(promt, filename, log_callback):
             if("429" in error or "rate" in error.lower()):
                 wait_time = (attemp + 1) * 5
             
-            log_callback(f"{filename}: ждём {wait_time}")
+                log_callback(f"{filename}: ждём {wait_time}")
 
-            time.sleep(wait_time)
+                time.sleep(wait_time)
 
-            continue
+                continue
 
     raise Exception("Предел попыток")
