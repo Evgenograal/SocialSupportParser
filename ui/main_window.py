@@ -118,7 +118,7 @@ class MainWindow(QWidget):
         self.run_btn.setEnabled(False)
         self.log_text.clear()\
         
-        self.log("НАЧАЛО ОБРАБОТКИ")
+        self.log("=== НАЧАЛО ОБРАБОТКИ ===")
 
         self.thread = threading.Thread(
             target = self.process_worker,
