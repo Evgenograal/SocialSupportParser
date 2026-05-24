@@ -33,8 +33,8 @@ class MainWindow(QWidget):
         self.init_ui()
 
         self.signals.log_signal.connect(self.log)
-
-        self.signals.progress_signal.connect(self.processing_done)
+        self.signals.progress_signal.connect(self.update_progress)
+        self.signals.done_signal.connect(self.processing_done)
 
     def init_ui(self):
         
@@ -91,9 +91,13 @@ class MainWindow(QWidget):
         self.log_text.append(text)
 
     def update_progress(self, current, total):
-        persent = int((current/total) * 100)
+        if total == 0:
+            percent = 0
+        else:
+            percent = int((current/total) * 100)
 
-        self.progress_label.setText(f"{current}/{total} ({persent}%)")
+        self.progress_label.setText(f"{current}/{total} ({percent}%)")
+        self.progress.setValue(percent)
 
     def start_processing(self):
         input_dir = self.input_edit.text()
@@ -112,9 +116,11 @@ class MainWindow(QWidget):
             self.output_edit.setText(output_dir)
         
         self.run_btn.setEnabled(False)
-        self.log_text.clear()
+        self.log_text.clear()\
+        
+        self.log("НАЧАЛО ОБРАБОТКИ")
 
-        thread = threading.Thread(
+        self.thread = threading.Thread(
             target = self.process_worker,
             args =(
                 input_dir, output_dir
@@ -122,13 +128,21 @@ class MainWindow(QWidget):
             daemon = True
         )
 
-        thread.start()
+        self.thread.start()
 
     def process_worker(self, input_dir, output_dir):
-        process_folder(input_dir, output_dir,
-                    self.signals.log_signal.emit,
-                    self.signals.progress_signal.emit)
-        self.signals.done_signal.emit()
+        try:
+            process_folder(input_dir, output_dir,
+                        self.signals.log_signal.emit,
+                        self.signals.progress_signal.emit)
+            self.signals.done_signal.emit()
+        
+        except Exception as e:
+            import traceback
+            self.signals.log_signal.emit(traceback.format_exc())
+
+        finally:
+            self.signals.done_signal.emit()
 
     def processing_done(self):
         self.run_btn.setEnabled(True)

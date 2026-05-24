@@ -52,7 +52,7 @@ def call_model(prompt, filename, log_callback):
             if("429" in error or "rate" in error.lower()):
                 wait_time = (attemp + 1) * 5
             
-                log_callback(f"{filename}: ждём {wait_time}")
+                log_callback(f"{filename}: ждём, время обработки: {wait_time} секунд")
 
                 time.sleep(wait_time)
 

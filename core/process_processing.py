@@ -36,13 +36,12 @@ def process_single_file(file_path, input_dir, output_dir, log_callback, log_file
 
         with open(out_path, 'w', encoding = 'utf-8') as f:
             json.dump(data, f, ensure_ascii = False, indent = 2)
-
-            time.sleep(Request_delay)
-
-            write_to_log_file(log_file_path, f"{filename} - Успешно обработан")
-
-            return filename, True, "OK"
         
+        time.sleep(Request_delay)
+        write_to_log_file(log_file_path, f"{filename} - Успешно обработан")
+
+        return filename, True, "OK"
+
     except Exception as e:
         write_to_log_file(log_file_path, f"{filename} - ошибка {str(e)}")
 
@@ -75,19 +74,19 @@ def process_folder(input_dir, output_dir, log_callback, progress_callback):
                 log_callback,
                 log_file_path): file
 
-        for file in files
+            for file in files
     }
     
-    for future in as_completed(futures):
-        filename, success, message = (future.result())
+        for future in as_completed(futures):
+            filename, success, message = (future.result())
 
-        completed += 1
+            completed += 1
 
-        progress_callback(completed, total)
+            progress_callback(completed, total)
 
-        if success:
-            log_callback(f"✓ {filename}")
+            if success:
+                log_callback(f"✓ {filename}")
 
-        else:
-            log_callback(f"✗ {filename}: {message}")
+            else:
+                log_callback(f"✗ {filename}: {message}")
     log_callback("=== ГОТОВО ===")
