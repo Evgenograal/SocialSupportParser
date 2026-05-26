@@ -3,6 +3,8 @@ import threading
 
 from core.reprocess import (reprocess_failed_files)
 
+from PyQt5.QtCore import QObject, pyqtSignal
+
 from PyQt5.QtWidgets import(
 QWidget,
 QLabel,
@@ -15,10 +17,20 @@ QLineEdit,
 QProgressBar
 )
 
+class Signals(QObject):
+    log_signal = pyqtSignal(str)
+    progress_signal = pyqtSignal(int, int)
+    done_signal = pyqtSignal()
+
 class ReprogressWindow(QWidget):
     def __init__(self):
         super().__init__()
+        self.signals = Signals()
         self.init_ui()
+        self.signals.log_signal.connect(self.log)
+        self.signals.progress_signal.connect(self.update_progress)
+
+        self.signals.done_signal.connect(self.retry_done)
     
     def init_ui(self):
         self.setWindowTitle("Повторная обработка")
@@ -86,6 +98,8 @@ class ReprogressWindow(QWidget):
         output_dir = self.output_edit.text()
         log_file = self.log_edit.text()
 
+        self.run_btn.setEnabled(False)
+
         self.thread = threading.Thread(
             target = self.retry_worker, args=(
                 input_dir, output_dir, log_file
@@ -108,4 +122,10 @@ class ReprogressWindow(QWidget):
         self.progress.setValue(percent)
 
     def retry_worker(self, input_dir, output_dir, log_file):
-        reprocess_failed_files(input_dir, output_dir, log_file, self.log, self.update_progress)
+        reprocess_failed_files(input_dir, output_dir, log_file, self.signals.log_signal.emit, self.signals.progress_signal.emit)
+        self.signals.done_signal.emit()
+
+    def retry_done(self):
+        self.run_btn.setEnabled(True)
+
+        self.log("=== ПОВТОРНАЯ ПОДГОТОВКА ГОТОВА ===")

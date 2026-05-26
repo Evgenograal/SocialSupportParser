@@ -2,6 +2,8 @@ import os
 
 from core.process_processing import (process_single_file)
 
+import shutil
+
 def get_failed_files(log_file_path):
     failed_files = []
 
@@ -34,6 +36,10 @@ def reprocess_failed_files(input_dir, output_dir, log_file_path, log_callback, p
     with open(retry_log, 'w', encoding = 'utf-8') as f:
         f.write("=== RETRY LOG ===\n")
 
+    failed_output_dir = os.path.join(output_dir, "failed_files_retry")
+
+    os.makedirs(failed_output_dir, exist_ok = True)
+
     for file_path in files_to_process:
         filename, success, message = (
             process_single_file(
@@ -52,6 +58,11 @@ def reprocess_failed_files(input_dir, output_dir, log_file_path, log_callback, p
         if success:
             log_callback(f"✓ успешная повторная обработка: {filename}")
 
-        else: log_callback(f"✗ ошибка: {filename}: {message}")
+        else: 
+            log_callback(f"✗ ошибка: {filename}: {message}")
+            try:
+                shutil.copy2(file_path, os.path.join(failed_output_dir, filename))
+            except Exception as copy_error:
+                log_callback(f"Ошибка копирования файла:{filename}: {copy_error}")
     
     log_callback("=== ПОВТОРНАЯ ОБРАБОТКА ГОТОВА ===")
