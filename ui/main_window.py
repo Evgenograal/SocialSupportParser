@@ -17,6 +17,8 @@ from PyQt5.QtCore import (QObject, pyqtSignal)
 
 from core.process_processing import (process_folder)
 
+from ui.reprocess_window import ReprogressWindow
+
 class Signals(QObject):
     log_signal = pyqtSignal(str)
 
@@ -60,7 +62,10 @@ class MainWindow(QWidget):
 
         self.run_btn = QPushButton("Запустить")
         self.run_btn.clicked.connect(self.start_processing)
-        
+
+        self.retry_btn = QPushButton("Повторная проверка")
+        self.retry_btn.clicked.connect(self.open_retry_window)
+
         self.progress = QProgressBar()
         self.progress_label = QLabel("0%")
 
@@ -70,6 +75,7 @@ class MainWindow(QWidget):
         layout.addLayout(row1)
         layout.addLayout(row2)
         layout.addWidget(self.run_btn) 
+        layout.addWidget(self.retry_btn)
         layout.addWidget(self.progress) 
         layout.addWidget(self.progress_label) 
         layout.addWidget(self.log_text)
@@ -122,9 +128,7 @@ class MainWindow(QWidget):
 
         self.thread = threading.Thread(
             target = self.process_worker,
-            args =(
-                input_dir, output_dir
-            ),
+            args = (input_dir, output_dir), 
             daemon = True
         )
 
@@ -146,3 +150,7 @@ class MainWindow(QWidget):
 
     def processing_done(self):
         self.run_btn.setEnabled(True)
+
+    def open_retry_window(self):
+        self.retry_window = ReprogressWindow()
+        self.retry_window.show()

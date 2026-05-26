@@ -52,6 +52,6 @@ def reprocess_failed_files(input_dir, output_dir, log_file_path, log_callback, p
         if success:
             log_callback(f"✓ успешная повторная обработка: {filename}")
 
-        else: log_callback(f"✗ retry: {filename}: {message}")
+        else: log_callback(f"✗ ошибка: {filename}: {message}")
     
     log_callback("=== ПОВТОРНАЯ ОБРАБОТКА ГОТОВА ===")
