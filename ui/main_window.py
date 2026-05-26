@@ -18,6 +18,7 @@ from PyQt5.QtCore import (QObject, pyqtSignal)
 from core.process_processing import (process_folder)
 
 from ui.reprocess_window import ReprogressWindow
+from ui.merge_window import MergeWindow
 
 class Signals(QObject):
     log_signal = pyqtSignal(str)
@@ -32,11 +33,11 @@ class MainWindow(QWidget):
 
         self.signals = Signals()
 
-        self.init_ui()
-
         self.signals.log_signal.connect(self.log)
         self.signals.progress_signal.connect(self.update_progress)
         self.signals.done_signal.connect(self.processing_done)
+
+        self.init_ui()
 
     def init_ui(self):
         
@@ -63,8 +64,13 @@ class MainWindow(QWidget):
         self.run_btn = QPushButton("Запустить")
         self.run_btn.clicked.connect(self.start_processing)
 
-        self.retry_btn = QPushButton("Повторная проверка")
+        buttons_row = QHBoxLayout()
+        self.retry_btn = QPushButton("Повторная обработка")
         self.retry_btn.clicked.connect(self.open_retry_window)
+        self.merge_btn = QPushButton("Объединение json")
+        self.merge_btn.clicked.connect(self.open_merge_window)
+        buttons_row.addWidget(self.retry_btn)
+        buttons_row.addWidget(self.merge_btn)
 
         self.progress = QProgressBar()
         self.progress_label = QLabel("0%")
@@ -75,7 +81,7 @@ class MainWindow(QWidget):
         layout.addLayout(row1)
         layout.addLayout(row2)
         layout.addWidget(self.run_btn) 
-        layout.addWidget(self.retry_btn)
+        layout.addLayout(buttons_row)
         layout.addWidget(self.progress) 
         layout.addWidget(self.progress_label) 
         layout.addWidget(self.log_text)
@@ -154,3 +160,7 @@ class MainWindow(QWidget):
     def open_retry_window(self):
         self.retry_window = ReprogressWindow()
         self.retry_window.show()
+
+    def open_merge_window(self):
+        self.merge_window = MergeWindow()
+        self.merge_window.show()
