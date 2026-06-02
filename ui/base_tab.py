@@ -19,7 +19,7 @@ class BaseTab(QWidget):
     def select_folder(self):
         return QFileDialog.getExistingDirectory(self, "Выберите папку")
     
-    def select_file(self, file_filter = "Все файлы(*)"):
+    def select_file(self, file_filter = "Все файлы (*)"):
         file_path, _ = QFileDialog.getOpenFileName(self, "Выберите файл", "", file_filter)
         return file_path
     

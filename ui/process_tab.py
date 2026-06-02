@@ -3,7 +3,6 @@ import threading
 
 from PyQt5.QtWidgets import (
     QPushButton,
-    QFileDialog,
     QHBoxLayout,
     QVBoxLayout,
     QTextEdit,
@@ -94,7 +93,7 @@ class ProcessTab(BaseTab):
         output_dir = self.output_edit.text()
 
         if not input_dir:
-            QMessageBox.critical(self, "Ошибка", "Выберите папку")
+            QMessageBox.critical(self, "Ошибка", "Выберите исходную папку")
 
             return
         
@@ -105,10 +104,10 @@ class ProcessTab(BaseTab):
 
             self.output_edit.setText(output_dir)
         
-            self.run_btn.setEnabled(False)
-            self.logs.clear()
+        self.run_btn.setEnabled(False)
+        self.logs.clear()
 
-            self.log("=== НАЧАЛО ОБРАБОТКИ ===")
+        self.log("=== НАЧАЛО ОБРАБОТКИ ===")
 
         self.thread = threading.Thread(
             target = self.process_worker,

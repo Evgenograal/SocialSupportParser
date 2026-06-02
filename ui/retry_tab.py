@@ -6,7 +6,8 @@ from PyQt5.QtWidgets import(
     QPushButton,
     QTextEdit,
     QLineEdit,
-    QProgressBar
+    QProgressBar,
+    QMessageBox
 )
 
 from ui.base_tab import BaseTab
@@ -91,7 +92,20 @@ class RetryTab(BaseTab):
 
     def start_retry(self):
 
+        if not self.input_edit.text():
+            QMessageBox.critical(self, "Ошибка", "Выберите исходную папку")
+            return
+        
+        if not self.output_edit.text():
+            QMessageBox.critical(self, "Ошибка", "Выберите выходную папку")
+            return
+        
+        if not self.log_edit.text():
+            QMessageBox.critical(self, "Ошибка", "Выберите лог-файл")
+            return
+
         self.run_btn.setEnabled(False)
+        self.logs.clear()
 
         self.thread = threading.Thread(
             target=self.retry_worker,
