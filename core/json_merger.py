@@ -60,4 +60,3 @@ def merge_json_to_md(md_dir, json_dirs, log_callback, progress_callback):
 
     log_callback(f"\nСкопировано: {copied}")
     log_callback(f"Не найдено: {not_found}")
-    log_callback("=== ГОТОВО ===")

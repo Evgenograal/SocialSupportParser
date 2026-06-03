@@ -29,6 +29,8 @@ def reprocess_failed_files(input_dir, output_dir, log_file_path, log_callback, p
     
     total = len(files_to_process)
 
+    log_callback(f"Найдено файлов для повторной проверки: {total}")
+
     completed = 0
 
     retry_log = os.path.join(output_dir, "retry_log.txt")

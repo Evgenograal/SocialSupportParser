@@ -82,11 +82,11 @@ class MergeTab(BaseTab):
 
     def start_merge(self):
         if not self.md_edit.text():
-            QMessageBox.warning(self, "Ошибка", "Выберите папку с md")
+            QMessageBox.critical(self, "Ошибка", "Выберите папку с md")
             return
 
         if not self.json_dirs:
-            QMessageBox.warning(self, "Ошибка", "Добавьте хотя бы одну папку с json")
+            QMessageBox.critical(self, "Ошибка", "Добавьте хотя бы одну папку с json")
             return
         
         self.logs.clear()

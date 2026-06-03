@@ -4,6 +4,7 @@ from PyQt5.QtGui import QIcon
 from ui.process_tab import ProcessTab
 from ui.retry_tab import RetryTab
 from ui.merge_tab import MergeTab
+from ui.json_viewer_tab import LoadJsonTab
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -22,5 +23,7 @@ class MainWindow(QMainWindow):
         tabs.addTab(RetryTab(), "Повторная обработка")
 
         tabs.addTab(MergeTab(), "Объединение JSON с MD")
+
+        tabs.addTab(LoadJsonTab(), "Просмотр JSON")
 
         self.setCentralWidget(tabs)
