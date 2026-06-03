@@ -4,11 +4,14 @@ from PyQt5.QtWidgets import (
     QVBoxLayout,
     QHBoxLayout,
     QPushButton,
-    QListWidget,
+    QTreeWidget,
     QTextEdit,
     QLineEdit,
-    QMessageBox
+    QMessageBox,
+    QSplitter
 )
+
+from PyQt5.QtCore import Qt
 
 from ui.base_tab import BaseTab
 
@@ -18,32 +21,83 @@ class LoadJsonTab(BaseTab):
     def __init__(self):
         super().__init__()
 
-        self.files = []
+        self.current_folder = ""
 
         self.init_ui()
 
     def init_ui(self):
+
         layout = QVBoxLayout()
 
-        row = QHBoxLayout()
+        folder_row = QHBoxLayout()
 
         self.folder_edit = QLineEdit()
 
-        btn_folder = QPushButton("Выбрать папку с json")
-        btn_folder.clicked.connect(self.select_json_folder)
+        btn_folder = QPushButton(
+            "Папка JSON"
+        )
 
-        row.addWidget(self.folder_edit)
-        row.addWidget(btn_folder)
+        btn_folder.clicked.connect(
+            self.select_json_folder
+        )
 
-        self.file_list = QListWidget()
-        self.file_list.itemClicked.connect(self.show_json)
+        folder_row.addWidget(
+            self.folder_edit
+        )
 
-        self.viewer = QLineEdit()
-        self.viewer.setReadOnly(True)
+        folder_row.addWidget(
+            btn_folder
+        )
 
-        layout.addLayout(row)
-        layout.addWidget(self.file_list)
-        layout.addWidget(self.viewer)
+        self.search_edit = QLineEdit()
+
+        self.search_edit.setPlaceholderText(
+            "Поиск по JSON..."
+        )
+
+        self.search_edit.textChanged.connect(
+            self.search_json
+        )
+
+        splitter = QSplitter()
+
+        self.file_tree = QTreeWidget()
+
+        self.file_tree.setHeaderLabel(
+            "Файлы"
+        )
+
+        self.file_tree.itemClicked.connect(
+            self.show_json
+        )
+
+        self.json_tree = QTreeWidget()
+
+        self.json_tree.setHeaderLabels(
+            ["Фильтр", "Значение"]
+        )
+
+        splitter.addWidget(
+            self.file_tree
+        )
+
+        splitter.addWidget(
+            self.json_tree
+        )
+
+        splitter.setSizes(
+            [300, 700]
+        )
+
+        layout.addLayout(folder_row)
+
+        layout.addWidget(
+            self.search_edit
+        )
+
+        layout.addWidget(
+            splitter
+        )
 
         self.setLayout(layout)
 
@@ -54,23 +108,34 @@ class LoadJsonTab(BaseTab):
             QMessageBox.critical(self, "Ошибка", "Выберите папку с json")
             return
         
+        self.current_folder = folder
+
         self.folder_edit.setText(folder)
 
-        self.file_list.clear()
-
-        self.files = get_json_files(folder)
-
-        for file_path in self.files:
-            self.file_list.addItem(file_path)
+        build_folder_tree(self.file_tree, folder)
     
     def show_json(self, item):
+        file_path = item.data(0, Qt.UserRole)
+
+        if not file_path:
+            QMessageBox.critical(self, "Ошибка", "Выберите папку")
+            return
+        
         try:
-            file_path = item.text()
+            self.json_tree.clear()
+
             data = load_json_file(file_path)
 
-            pretty = json.dumps(data, ensure_ascii = False, indent = 4)
+            build_json_tree(self.json_tree.invisibleRootItem(), data)
 
-            self.viewer.setPlainText(pretty)
+            self.json_tree.expandToDepth(1)
 
         except Exception as e:
-            self.viewer.setPlainText(f"Ошибка: {e}")
+            QMessageBox.critical(self, "Ошибка", str(e))
+
+    def search_json(self, text):
+        text = text.lower()
+
+        root = self.json_tree.invisibleRootItem()
+
+        filter_json_tree(root, text)
