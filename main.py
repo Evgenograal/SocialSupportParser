@@ -1,12 +1,15 @@
 from PyQt5.QtWidgets import QApplication
 from ui.loading_screen import LoadingScreen
 import sys
+import qdarktheme
 
 def progress_events(app):
     app.processEvents()
 
 def main():
     app = QApplication(sys.argv)
+    stylesheet = qdarktheme.load_stylesheet(theme="dark")
+    app.setStyleSheet(stylesheet)
 
     splash = LoadingScreen()
     splash.show()
