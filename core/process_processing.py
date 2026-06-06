@@ -3,7 +3,7 @@ import json
 import time
 
 from concurrent.futures import(ThreadPoolExecutor, as_completed)
-from configAI import(Max_workers, Request_delay)
+from core.settings import get_settings
 from core.logger import(write_to_log_file)
 from core.parser import(clean_text, extract_json)
 from core.prompts import(build_prompt)
@@ -37,7 +37,7 @@ def process_single_file(file_path, input_dir, output_dir, log_callback, log_file
         with open(out_path, 'w', encoding = 'utf-8') as f:
             json.dump(data, f, ensure_ascii = False, indent = 2)
         
-        time.sleep(Request_delay)
+        time.sleep(get_settings("request_delay", 0.5))
         write_to_log_file(log_file_path, f"{filename} - Успешно обработан")
 
         return filename, True, "OK"
@@ -64,7 +64,7 @@ def process_folder(input_dir, output_dir, log_callback, progress_callback):
 
     completed = 0
 
-    with ThreadPoolExecutor(max_workers = Max_workers) as executor:
+    with ThreadPoolExecutor(max_workers = get_settings("max_workers", 5)) as executor:
         futures = {
             executor.submit(
                 process_single_file, 

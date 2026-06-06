@@ -1,13 +1,13 @@
 import threading
 import time
 from openai import OpenAI
-from configAI import *
+from core.settings import get_settings
 
 clients = []
 
-for key in Api_keys:
+for key in get_settings("api_keys", []):
     clients.append(
-        OpenAI(base_url = Base_url, api_key = key)
+        OpenAI(base_url = get_settings("base_url"), api_key = key)
     )
 
 client_index = 0
@@ -24,13 +24,13 @@ def get_client():
     return client 
 
 def call_model(prompt, filename, log_callback):
-    for attemp in range(Max_retries):
+    for attemp in range(get_settings("max_retries", 10)):
         try:
             client = get_client()
 
             completion = (
                 client.chat.completions.create(
-                    model = Model,
+                    model = get_settings("model"),
                     messages = [
                         {
                             'role': 'user',
