@@ -66,5 +66,3 @@ def reprocess_failed_files(input_dir, output_dir, log_file_path, log_callback, p
                 shutil.copy2(file_path, os.path.join(failed_output_dir, filename))
             except Exception as copy_error:
                 log_callback(f"Ошибка копирования файла:{filename}: {copy_error}")
-    
-    log_callback("=== ПОВТОРНАЯ ОБРАБОТКА ГОТОВА ===")
